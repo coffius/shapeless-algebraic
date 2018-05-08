@@ -1,7 +1,8 @@
 package io.koff.syntax_tree
 
-import cats.effect.IO
 import io.koff.syntax_tree.Dsl._
+import io.koff.syntax_tree.exp.{Exp, ExpAlgebra}
+import io.koff.syntax_tree.hexp.IOExpAlgebra
 
 import scala.math.Numeric.IntIsIntegral
 
