@@ -1,16 +1,16 @@
 package io.koff.syntax_tree
 
+import cats.effect.IO
 import io.koff.syntax_tree.Dsl._
-import io.koff.syntax_tree.Exp.FreeExp
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.math.Numeric.IntIsIntegral
 
 object Main {
   def main(args: Array[String]): Unit = {
     lazyMain()
     ioMain()
-    freeMain()
+    expMain()
+    highExpMain()
   }
 
   def lazyMain(): Unit = {
@@ -30,16 +30,17 @@ object Main {
     println(s"ioResult.value: ${ioResult.unsafeRunSync()}")
   }
 
-  def freeMain(): Unit = {
-    import cats.instances.future._
-    import scala.concurrent.ExecutionContext.Implicits.global
+  def expMain(): Unit = {
+    implicit val expAlg: ExpAlgebra.type = ExpAlgebra
 
-    implicit val freeAlg = FreeAlgebra
+    val expResult: Exp[Int] = 4 *? 4 +? 4
+    println(s"expResult: $expResult")
+  }
 
-    val freeResult: FreeExp[Int] = 4 *? 4 +? 4
-    val asyncResult = freeResult.foldMap(FreeInterpreter.interpreter[Future])
-    val result = Await.result(asyncResult, Duration.Inf)
-    println(s"freeResult: $freeResult")
-    println(s"result: $result")
+  def highExpMain(): Unit = {
+    implicit val alg = IOExpAlgebra.lowAlg
+
+    val expResult = 5 *? 5 +? 5
+    println(s"expResult: $expResult")
   }
 }
